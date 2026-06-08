@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "misty-nova-alarm"
@@ -21,13 +21,13 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "typer[all]==0.12.3",
-    "rich==13.7.1",
-    "pydantic==2.7.1",
-    "python-dateutil==2.9.0",
-    "apscheduler==3.10.4",
-    "pygame==2.5.2",
-    "psutil==5.9.8",
+    "typer[all]>=0.12",
+    "rich>=13.0",
+    "pydantic>=1.10,<3",
+    "python-dateutil>=2.8",
+    "apscheduler>=3.10,<4",
+    # Sound: winsound (stdlib) on Windows; no external audio dependency
+    # Process management: ctypes/os.kill (stdlib); no psutil needed
 ]
 
 [project.scripts]
