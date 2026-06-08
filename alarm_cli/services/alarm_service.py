@@ -34,12 +34,13 @@ class AlarmService:
         return alarm
 
     def get_due_alarms(self, now: Optional[datetime] = None) -> List[Alarm]:
-        """Return PENDING alarms whose scheduled_at <= now."""
+        """Return PENDING or SNOOZED alarms whose scheduled_at <= now."""
         if now is None:
             now = datetime.now(tz=timezone.utc)
         return [
             a for a in self._storage.load_all()
-            if a.status == AlarmStatus.PENDING and a.scheduled_at <= now
+            if a.status in (AlarmStatus.PENDING, AlarmStatus.SNOOZED)
+            and a.scheduled_at <= now
         ]
 
     def mark_triggered(self, alarm_id: str) -> None:
@@ -66,6 +67,13 @@ class AlarmService:
         })
         self._storage.upsert(snoozed)
         return snoozed
+
+    def dismiss(self, alarm_id: str) -> None:
+        """Mark alarm as DISMISSED (user explicitly closed the notification)."""
+        alarm = self._storage.get_by_id(alarm_id)
+        if alarm is None:
+            raise ValueError(f"Alarm {alarm_id} not found")
+        self._storage.upsert(alarm.copy(update={"status": AlarmStatus.DISMISSED}))
 
     def delete(self, alarm_id: str) -> bool:
         return self._storage.delete(alarm_id)

@@ -174,3 +174,45 @@ class TestListAlarms:
         storage.upsert(alarm)
         service.delete(alarm.id)
         assert service.list_alarms(include_done=True) == []
+
+
+class TestDismiss:
+    def test_dismiss_sets_status_dismissed(
+        self, service: AlarmService, storage: StorageService
+    ):
+        alarm = Alarm(label="Bye", scheduled_at=_FUTURE, status=AlarmStatus.TRIGGERED)
+        storage.upsert(alarm)
+        service.dismiss(alarm.id)
+        updated = storage.get_by_id(alarm.id)
+        assert updated is not None
+        assert updated.status == AlarmStatus.DISMISSED
+
+    def test_dismiss_raises_for_unknown_id(self, service: AlarmService):
+        with pytest.raises(ValueError, match="not found"):
+            service.dismiss("00000000")
+
+
+class TestGetDueAlarmsSnoozed:
+    def test_snoozed_alarm_returned_when_due(
+        self, service: AlarmService, storage: StorageService
+    ):
+        snoozed = Alarm(
+            label="Snoozed",
+            scheduled_at=_NOW - timedelta(minutes=1),
+            status=AlarmStatus.SNOOZED,
+        )
+        storage.upsert(snoozed)
+        result = service.get_due_alarms(now=_NOW)
+        assert any(a.id == snoozed.id for a in result)
+
+    def test_snoozed_alarm_not_returned_when_not_yet_due(
+        self, service: AlarmService, storage: StorageService
+    ):
+        snoozed = Alarm(
+            label="NotYet",
+            scheduled_at=_NOW + timedelta(minutes=5),
+            status=AlarmStatus.SNOOZED,
+        )
+        storage.upsert(snoozed)
+        result = service.get_due_alarms(now=_NOW)
+        assert result == []
