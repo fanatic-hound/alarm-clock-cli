@@ -1,0 +1,7 @@
+typer[all]==0.12.3
+rich==13.7.1
+pydantic==2.7.1
+python-dateutil==2.9.0
+apscheduler==3.10.4
+# Audio: winsound (stdlib) on Windows; pygame optional for cross-platform
+# Process checking: ctypes/subprocess (stdlib) — no psutil needed

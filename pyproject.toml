@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "misty-nova-alarm"
+version = "1.0.0"
+description = "A production-quality CLI alarm clock with sound, Rich UI, and a background daemon"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Misty Nova" }]
+keywords = ["alarm", "cli", "scheduler", "terminal"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "typer[all]==0.12.3",
+    "rich==13.7.1",
+    "pydantic==2.7.1",
+    "python-dateutil==2.9.0",
+    "apscheduler==3.10.4",
+    "pygame==2.5.2",
+    "psutil==5.9.8",
+]
+
+[project.scripts]
+alarm = "alarm_cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["alarm_cli*"]
+
+[tool.setuptools.package-data]
+"alarm_cli.assets" = ["*.wav"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: marks tests as integration tests (deselect with '-m not integration')"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
